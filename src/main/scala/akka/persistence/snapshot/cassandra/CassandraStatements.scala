@@ -3,7 +3,6 @@ package akka.persistence.snapshot.cassandra
 trait CassandraStatements {
   def keyspace: String
   def table: String
-  def maxResultSize: Int
 
   def createKeyspace(replicationFactor: Int) = s"""
       CREATE KEYSPACE IF NOT EXISTS ${keyspace}
@@ -29,8 +28,12 @@ trait CassandraStatements {
       DELETE FROM ${tableName} where processor_id = ? and sequence_nr = ? and timestamp = ?
     """
 
+  def deleteSnapshots= s"""
+      DELETE FROM ${tableName} where processor_id = ? and sequence_nr < ? and timestamp < ?
+    """
+
   def loadSnapshot= s"""
-      SELECT * FROM ${tableName} where processor_id = ? and sequence_nr < ? and timestamp < ?
+      SELECT * FROM ${tableName} where processor_id = ? and sequence_nr < ? and timestamp < ? order by sequence_nr desc limit 1
      """
 
   private def tableName = s"${keyspace}.${table}"
