@@ -16,7 +16,7 @@ trait CassandraStatements {
         timestamp timestamp,
         snapshot blob,
         PRIMARY KEY (processor_id, sequence_nr, timestamp))
-        WITH COMPACT STORAGE
+        WITH COMPACT STORAGE AND CLUSTERING ORDER BY (sequence_nr DESC)
     """
 
   def writeSnapshot= s"""
